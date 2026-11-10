@@ -1,0 +1,30 @@
+name: Hourly habit reminders
+on:
+  # Enable after reminder providers and repository secrets are configured:
+  # schedule:
+  #   - cron: "17 * * * *"
+  workflow_dispatch:
+permissions: {}
+concurrency:
+  group: hourly-habit-reminders
+  cancel-in-progress: false
+jobs:
+  reminders:
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - name: Deliver due reminders
+        shell: pwsh
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          $endpoint = $env:APP_URL.TrimEnd('/') + '/api/reminders/run'
+          $nextUrl = $endpoint
+          $failures = 0
+          do {
+            $page = Invoke-RestMethod -Method Post -Uri $nextUrl -Headers @{Authorization = "Bearer $env:CRON_SECRET"}
+            $failures += $page.errors
+            $nextUrl = $endpoint + '?after=' + $page.next
+          } while ($page.next)
+          if ($failures -gt 0) { throw "$failures reminder operations failed. Inspect server logs." }

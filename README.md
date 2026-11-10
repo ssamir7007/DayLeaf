@@ -1,5 +1,7 @@
 # Dayleaf
 
+**Live app:** [Open Dayleaf on Vercel](https://dayleaf-ssamir.vercel.app)
+
 A responsive personal habit journal built with Next.js App Router, TypeScript and Supabase. The signed-in journal has Today, Habits and Settings views. The public landing page includes a small interactive example. Email and SMS reminders are independently opt-in.
 
 ## Run on Windows
